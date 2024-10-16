@@ -10,10 +10,6 @@ variable "POSTGRES_DATABASE" {
   type = string
 }
 
-variable "ECHO_TEXT" {
-  type = string
-}
-
 job "echo" {
   group "echo-group" {
     count = 3

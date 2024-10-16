@@ -74,7 +74,6 @@ export default $config({
 				jobspec: readFileSync(".nomad/echo.nomad", "utf-8"),
 				hcl2: {
 					vars: {
-						ECHO_TEXT: "Hello",
 						POSTGRES_PASSWORD: postgresPassword,
 						POSTGRES_USER: postgresUser,
 						POSTGRES_DATABASE: postgresDatabase
