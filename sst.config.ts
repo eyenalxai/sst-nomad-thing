@@ -6,6 +6,9 @@ const getEnvVariables = () => {
 	const nomadUrl = process.env.NOMAD_URL
 	if (!nomadUrl) throw new Error("NOMAD_URL is not set")
 
+	const nomadToken = process.env.NOMAD_TOKEN
+	if (!nomadToken) throw new Error("NOMAD_TOKEN is not set")
+
 	const postgresPassword = process.env.POSTGRES_PASSWORD
 	if (!postgresPassword) throw new Error("POSTGRES_PASSWORD is not set")
 
@@ -17,6 +20,7 @@ const getEnvVariables = () => {
 
 	return {
 		nomadUrl,
+		nomadToken,
 		postgresPassword,
 		postgresUser,
 		postgresDatabase
@@ -33,12 +37,20 @@ export default $config({
 		}
 	},
 	async run() {
-		const { nomadUrl, postgresPassword, postgresUser, postgresDatabase } =
-			getEnvVariables()
+		const {
+			nomadUrl,
+			nomadToken,
+			postgresPassword,
+			postgresUser,
+			postgresDatabase
+		} = getEnvVariables()
+
+		console.log("nomadToken", nomadToken)
 
 		const nomadProvider = new nomad.Provider("NomadProvider", {
 			address: nomadUrl,
-			skipVerify: true
+			skipVerify: true,
+			secretId: nomadToken
 		})
 
 		const traefik = new nomad.Job(
