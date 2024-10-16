@@ -56,7 +56,6 @@ job "traefik" {
         data = <<EOF
 CF_DNS_API_TOKEN="{{ key "traefik/cf_dns_api_token" }}"
 EOF
-
         destination = "secrets/env"
         env         = true
       }
