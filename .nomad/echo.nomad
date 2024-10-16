@@ -58,7 +58,7 @@ job "echo" {
 
       template {
         data = <<EOF
-{{- range service "postgres" }}
+{{- range nomadService "postgres" }}
 DATABASE_URL=postgres://${var.POSTGRES_USER}:${var.POSTGRES_PASSWORD}@{{ .Address }}:{{ .Port }}/${var.POSTGRES_DATABASE}
 {{- end }}
 EOF
