@@ -49,7 +49,7 @@ export default $config({
 
 		const nomadProvider = new nomad.Provider("NomadProvider", {
 			address: nomadUrl,
-			skipVerify: true,
+			skipVerify: false,
 			secretId: nomadToken
 		})
 
