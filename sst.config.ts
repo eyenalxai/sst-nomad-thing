@@ -1,0 +1,94 @@
+/// <reference path="./.sst/platform/config.d.ts" />
+
+import { readFileSync } from "node:fs"
+
+const getEnvVariables = () => {
+	const nomadUrl = process.env.NOMAD_URL
+	if (!nomadUrl) throw new Error("NOMAD_URL is not set")
+
+	const postgresPassword = process.env.POSTGRES_PASSWORD
+	if (!postgresPassword) throw new Error("POSTGRES_PASSWORD is not set")
+
+	const postgresUser = process.env.POSTGRES_USER
+	if (!postgresUser) throw new Error("POSTGRES_USER is not set")
+
+	const postgresDatabase = process.env.POSTGRES_DB
+	if (!postgresDatabase) throw new Error("POSTGRES_DB is not set")
+
+	return {
+		nomadUrl,
+		postgresPassword,
+		postgresUser,
+		postgresDatabase
+	}
+}
+
+export default $config({
+	app(input) {
+		return {
+			name: "sst-nomad-thing",
+			removal: input?.stage === "production" ? "retain" : "remove",
+			home: "local",
+			providers: { nomad: "2.3.3" }
+		}
+	},
+	async run() {
+		const { nomadUrl, postgresPassword, postgresUser, postgresDatabase } =
+			getEnvVariables()
+
+		const nomadProvider = new nomad.Provider("NomadProvider", {
+			address: nomadUrl,
+			skipVerify: true
+		})
+
+		const traefik = new nomad.Job(
+			"Traefik",
+			{
+				jobspec: readFileSync(".nomad/traefik.nomad", "utf-8"),
+				hcl2: {
+					vars: {
+						NOMAD_URL: nomadUrl
+					}
+				}
+			},
+			{
+				provider: nomadProvider
+			}
+		)
+
+		const echo = new nomad.Job(
+			"Echo",
+			{
+				jobspec: readFileSync(".nomad/echo.nomad", "utf-8"),
+				hcl2: {
+					vars: {
+						ECHO_TEXT: "Hello",
+						POSTGRES_PASSWORD: postgresPassword,
+						POSTGRES_USER: postgresUser,
+						POSTGRES_DATABASE: postgresDatabase
+					}
+				}
+			},
+			{
+				provider: nomadProvider
+			}
+		)
+
+		const postgres = new nomad.Job(
+			"Postgres",
+			{
+				jobspec: readFileSync(".nomad/postgres.nomad", "utf-8"),
+				hcl2: {
+					vars: {
+						POSTGRES_PASSWORD: postgresPassword,
+						POSTGRES_USER: postgresUser,
+						POSTGRES_DATABASE: postgresDatabase
+					}
+				}
+			},
+			{
+				provider: nomadProvider
+			}
+		)
+	}
+})
