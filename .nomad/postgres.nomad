@@ -10,6 +10,10 @@ variable "POSTGRES_DATABASE" {
   type = string
 }
 
+variable "DOMAIN" {
+  type = string
+}
+
 job "postgres" {
   group "postgres-group" {
     network {
@@ -27,7 +31,7 @@ job "postgres" {
       tags = [
         "database",
         "traefik.enable=true",
-        "traefik.tcp.routers.db.rule=HostSNI(`database.example.com`)",
+        "traefik.tcp.routers.db.rule=HostSNI(`database.${var.DOMAIN}`)",
         "traefik.tcp.routers.db.tls=true",
         "traefik.tcp.routers.db.entrypoints=database",
         "traefik.tcp.routers.db.tls.certresolver=myresolver",

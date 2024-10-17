@@ -9,6 +9,9 @@ const getEnvVariables = () => {
 	const nomadToken = process.env.NOMAD_TOKEN
 	if (!nomadToken) throw new Error("NOMAD_TOKEN is not set")
 
+	const domain = process.env.DOMAIN
+	if (!domain) throw new Error("DOMAIN is not set")
+
 	const postgresPassword = process.env.POSTGRES_PASSWORD
 	if (!postgresPassword) throw new Error("POSTGRES_PASSWORD is not set")
 
@@ -21,6 +24,7 @@ const getEnvVariables = () => {
 	return {
 		nomadUrl,
 		nomadToken,
+		domain,
 		postgresPassword,
 		postgresUser,
 		postgresDatabase
@@ -40,12 +44,11 @@ export default $config({
 		const {
 			nomadUrl,
 			nomadToken,
+			domain,
 			postgresPassword,
 			postgresUser,
 			postgresDatabase
 		} = getEnvVariables()
-
-		console.log("nomadToken", nomadToken)
 
 		const nomadProvider = new nomad.Provider("NomadProvider", {
 			address: nomadUrl,
@@ -76,7 +79,8 @@ export default $config({
 					vars: {
 						POSTGRES_PASSWORD: postgresPassword,
 						POSTGRES_USER: postgresUser,
-						POSTGRES_DATABASE: postgresDatabase
+						POSTGRES_DATABASE: postgresDatabase,
+						DOMAIN: domain
 					}
 				}
 			},
@@ -93,7 +97,8 @@ export default $config({
 					vars: {
 						POSTGRES_PASSWORD: postgresPassword,
 						POSTGRES_USER: postgresUser,
-						POSTGRES_DATABASE: postgresDatabase
+						POSTGRES_DATABASE: postgresDatabase,
+						DOMAIN: domain
 					}
 				}
 			},

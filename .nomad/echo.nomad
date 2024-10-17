@@ -10,6 +10,10 @@ variable "POSTGRES_DATABASE" {
   type = string
 }
 
+variable "DOMAIN" {
+  type = string
+}
+
 job "echo" {
   group "echo-group" {
     count = 3
@@ -29,7 +33,7 @@ job "echo" {
       tags = [
         "http-echo",
         "traefik.enable=true",
-        "traefik.http.routers.http-echo.rule=Host(`example.com`)",
+        "traefik.http.routers.http-echo.rule=Host(`${var.DOMAIN}`)",
         "traefik.http.routers.http-echo.entrypoints=websecure",
         "traefik.http.routers.http-echo.tls.certresolver=myresolver",
         "traefik.http.services.http-echo.loadbalancer.server.port=${NOMAD_PORT_http}"
